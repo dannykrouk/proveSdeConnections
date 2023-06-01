@@ -5,16 +5,25 @@ import arcpy
 from arcpy import env
 from pathlib import Path
 import argparse
+import logging
+import sys 
 
 def main(argv=None):
+    
+    # logging to the current working directory and stdout
+    logging.basicConfig(filename="proveSdeConnections.log",encoding="utf-8",level=logging.DEBUG, format="%(asctime)s %(levelname)-8s %(message)s",datefmt="%Y-%m-%d %H:%M:%S")
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    print("")
+    logging.info("*** PROVING .SDE CONNECTIONS ***")
+    print("")
     parser = argparse.ArgumentParser()
     parser.add_argument('sdeFiles', help=('Comma delimited list of .sde files'))
     args = parser.parse_args()
     sdeFiles = args.sdeFiles
+    logging.info("sdeFiles to be tested: " + sdeFiles)
+    print("")
+    
     sdeFileList = sdeFiles.split(",")
-    print("")
-    print("Processing " + str(len(sdeFileList)) + " files ...")
-    print("")
     for sdeFile in sdeFileList:
         file = Path(sdeFile)
         if (file.is_file()):
@@ -23,68 +32,69 @@ def main(argv=None):
                 reportConnectionProperties(sdeFile, desc)
                 reportFeatureClassCount(sdeFile)
             except Exception as e:
-                print ("ERROR processing: " + sdeFile + ": " + str(e))
+                logging.error("CONNECTION FAILED TO: " + sdeFile)
+                logging.error("  ERROR message: " + str(e))
             print("")
         else:
-            print("ERROR! File does not exist: " + sdeFile)
+            logging.error("ERROR! File does not exist: " + sdeFile)
             print("")
     print("")
-    print("DONE!")
+    logging.info("### PROVING .SDE CONNECTIONS COMPLETE ###")
  
 
 def reportFeatureClassCount(targetSdeName):
     env.overwriteOutput = True
     env.workspace = targetSdeName
     fcList = arcpy.ListFeatureClasses()
-    print ("  NUMBER OF FEATURECLASSES FOUND on connection: " + str(len(fcList)))
+    logging.info("  NUMBER OF FEATURECLASSES FOUND on connection: " + str(len(fcList)))
 
 def reportConnectionProperties(targetSdeName, desc):
-    print ("FILE: " + targetSdeName + " properties:")
+    logging.info("FILE: " + targetSdeName + " properties:")
     connectionProperties = desc.connectionProperties
     try:
-        print("%-12s %s" % ("  Server:", connectionProperties.server))
+        logging.info("  Server: " + connectionProperties.server)
     except:
-        print("  - No server property")
+        logging.info("  - No server property")
     try:
-        print("%-12s %s" % ("  Instance:", connectionProperties.instance))
+        logging.info("  Instance: " + connectionProperties.instance)
     except:
-        print("  - No instance property")
+        logging.info("  - No instance property")
     try:
-        print("%-12s %s" % ("  Database:", connectionProperties.database))
+        logging.info("  Database: " + connectionProperties.database)
     except:
-        print("  - No database property")
+        logging.info("  - No database property")
     try:
-        print("%-12s %s" % ("  User:", connectionProperties.user))
+        logging.info("  User: " + connectionProperties.user)
     except:
-        print("  - No user property")
+        logging.info("  - No user property")
     try:
-        print("%-12s %s" % ("  Version:", connectionProperties.version))
+        logging.info("  Version: " + connectionProperties.version)
     except:
-        print("  - No version property")
+        logging.info("  - No version property")
     try:
-        print("%-12s %s" % ("  Authentication Mode:", connectionProperties.authentication_mode))
+        logging.info("  Authentication Mode: " + connectionProperties.authentication_mode)
     except:
-        print("  - No authentication mode property")        
+        logging.info("  - No authentication mode property")        
     try:
-        print("%-12s %s" % ("  Historical Name:", connectionProperties.historical_name))
+        logging.info("  Historical Name: " + connectionProperties.historical_name)
     except:
-        print("  - No historical name property")        
+        logging.info("  - No historical name property")        
     try:
-        print("%-12s %s" % ("  Historical Timestamp:", connectionProperties.historical_timestamp))
+        logging.info("  Historical Timestamp: " + connectionProperties.historical_timestamp)
     except:
-        print("  - No historical timestamp property")        
+        logging.info("  - No historical timestamp property")        
     try:
-        print("%-12s %s" % ("  Is Geodatabase:", connectionProperties.is_geodatabase))
+        logging.info("  Is Geodatabase: " + connectionProperties.is_geodatabase)
     except:
-        print("  - No is_geodatabase property")    
+        logging.info("  - No is_geodatabase property")    
     try:
-        print("%-12s %s" % ("  Branch:", connectionProperties.branch))
+        logging.info("  Branch: " + connectionProperties.branch)
     except:
-        print("  - No branch property")   
+        logging.info("  - No branch property")   
     try:
-        print("%-12s %s" % ("  Geodatabase release:", desc.release))
+        logging.info("  Geodatabase release: " +  desc.release)
     except:
-        print("  - No Geodatabase release property")   
+        logging.info("  - No Geodatabase release property")   
        
 if __name__ == "__main__":
 	sys.exit(main(sys.argv))

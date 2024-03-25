@@ -37,6 +37,11 @@ def main(argv=None):
         if (file.is_file()):
             try:
                 desc = arcpy.Describe(sdeFile)
+                if (desc.dataType == 'File'):
+                    # When arcpy sees the describe data type as 'File', it means it could not connect to the workspace
+                    # For reasons unknown to me, arcpy requires connection to the target to be able to report on the 
+                    # contents of the .sde file
+                    raise Exception('The target cannot be reached.  Check to see if the instance is down/inaccessible, drivers are missing, or contents of the .sde file are incorrect')		    
                 reportConnectionProperties(sdeFile, desc)
                 reportFeatureClassCount(sdeFile)
             except Exception as e:

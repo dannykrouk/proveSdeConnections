@@ -1,6 +1,14 @@
 # This script can be used to prove the connectability of eGDB connections (.sde files) from ArcGIS Server
 # The script can be run from the Python included with ArcGIS Server
-# Usage Example: "C:\Program Files\ArcGIS\Server\framework\runtime\ArcGIS\bin\Python\Scripts\propy.bat" c:\path\proveSdeConnections.py "c:\path\myConnection1.sde,c:\path\myConnection2.sde"
+
+# Run from anywhere:
+# Usage Example #1: "C:\Program Files\ArcGIS\Server\framework\runtime\ArcGIS\bin\Python\Scripts\propy.bat" c:\path\proveSdeConnections.py "c:\path\myConnection1.sde,c:\path\myConnection2.sde"
+# Run from the Python directory in ArcGIS Server:
+# Usage Example #2: C:\Program Files\ArcGIS\Server\framework\runtime\ArcGIS\bin\Python\Scripts\>propy.bat c:\path\proveSdeConnections.py "c:\path\myConnection1.sde,c:\path\myConnection2.sde"
+
+# NOTE: If you get an execution error mentioning "Unrecognized argument(s): encoding", you should remove the encoding parameter on line #21 so that it looks like this instead:
+#     logging.basicConfig(filename="proveSdeConnections.log",level=logging.DEBUG, format="%(asctime)s %(levelname)-8s %(message)s",datefmt="%Y-%m-%d %H:%M:%S")
+
 import arcpy
 from arcpy import env
 from pathlib import Path

@@ -47,6 +47,13 @@ def main(argv=None):
             except Exception as e:
                 logging.error("CONNECTION FAILED TO: " + sdeFile)
                 logging.error("  ERROR message: " + str(e))
+                try:
+                    # If we cannot connect for any reason, we try to report the text content of the .sde file ...
+                    fileContent = returnSdeFileText(sdeFile)
+                    logging.info('FILE CONTENT: ' + fileContent)
+                except:
+                    logging.error("UNABLE TO READ TEXT FROM FILE: " + sdeFile)
+                    logging.error("  ERROR message: " + str(e))		    
             print("")
         else:
             logging.error("ERROR! File does not exist: " + sdeFile)
@@ -54,6 +61,23 @@ def main(argv=None):
     print("")
     logging.info("### PROVING .SDE CONNECTIONS COMPLETE ###")
  
+def returnSdeFileText(fileName):
+	chunkSize = 16
+	accumulatedAsciiText = '' 
+	with open (fileName,'rb') as theFile:
+		while True:
+			data = theFile.read(chunkSize)
+			hexdata = data.hex()
+			if len(hexdata) == 0:
+				break #when we're out of data from the file, we exit the read loop
+			try:            
+				line = data.decode("utf-8") # if we cannot decode the data to utf-8  (i.e. it is not a bytestring, it is something else), we skip the chunk
+				lineAsciiFiltered = ' '.join(i for i in line if (ord(i) > 31 and ord(i) < 126)) # replace goofy characters with a space
+				if (len(lineAsciiFiltered) > 0):
+					accumulatedAsciiText = accumulatedAsciiText + ' '  + lineAsciiFiltered # add any characters found to our eventual return value
+			except: 
+				line = '' # do nothing because we could decode to utf-8
+	return accumulatedAsciiText
 
 def reportFeatureClassCount(targetSdeName):
     env.overwriteOutput = True
